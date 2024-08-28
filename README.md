@@ -25,9 +25,7 @@ python3 gen.py
 
 It writes e-mails in two formats:
 * `.eml` files to the current directory
-* plaintext to the terminal.
-
-As of 28 August 2024, the `.eml` files are untested since I don't have a client that supports them (for e-mail I use the Outlook web client).
+* plaintext to the terminal
 
 ### Acknowledgments
 
