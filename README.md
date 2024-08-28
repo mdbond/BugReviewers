@@ -19,6 +19,7 @@ Important: You'll need to edit `gen.py` to match your use case. At a minimum, ch
 ### Running the script
 
 ```
+rm -f *.eml # Remove previously generated .eml files to avoid confusing old and new .eml files
 python3 gen.py
 ```
 
