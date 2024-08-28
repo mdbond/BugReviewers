@@ -69,6 +69,7 @@ def generate_eml_files(emails):
         msg = MIMEMultipart()
         msg['From'] = 'Michael Bond <mikebond@cse.ohio-state.edu>' # Replace with your email
         msg['To'] = email
+        msg['Cc'] = 'asplos2025pcchairs@gmail.com' # Remove if not for ASPLOS 2025
         msg['Subject'] = subject
 
         # Attach the message body
@@ -85,6 +86,7 @@ def main(submissions_html, pc_html):
     
     for email, subject, message in emails:
         print(f"To: {email}")
+        print(f"Cc: asplos2025pcchairs@gmail.com") # Remove if not for ASPLOS 2025
         print(f"Subject: {subject}")
         print(f"Message:\n{message}\n")
 
