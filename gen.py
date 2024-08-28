@@ -9,17 +9,15 @@ def extract_delinquent_reviewers(submissions_html, pc_html):
         submissions_soup = BeautifulSoup(file, 'html.parser')
 
     delinquent_reviewers = {}
-    
+
     # Find all rows representing papers
     for paper in submissions_soup.find_all('tr', id=lambda x: x and x.startswith('p')):
         paper_id = paper['id'].replace('p', '')
         # Look for the div containing the reviewers
         reviewers_div = paper.find_next_sibling('tr', class_='plx')
-#        print(f"{reviewers_div}")
         if reviewers_div:
             # Locate the list of reviewers
             reviewer_list = reviewers_div.find('ul', class_='comma')
- #           print(f"{reviewer_list}")
             if reviewer_list:
                 for li in reviewer_list.find_all('li'):
                     reviewer_name = li.get_text(strip=True).split('(')[0].strip()
@@ -48,8 +46,6 @@ def extract_delinquent_reviewers(submissions_html, pc_html):
             email = email_td.find('a').get_text(strip=True)
             reviewer_emails[name] = email
 
-    print(f"{reviewer_emails}")
-
     return delinquent_reviewers, reviewer_emails
 
 def generate_emails(delinquent_reviewers, reviewer_emails):
@@ -60,8 +56,9 @@ def generate_emails(delinquent_reviewers, reviewer_emails):
         if email:
             first_name = reviewer.split()[0]
             paper_word = 'paper' if len(papers) == 1 else 'papers'
-            subject = f"Reminder: ASPLOS reviews for {paper_word} {', '.join(papers)} due soon"
-            message = f"Hi {first_name},\n\nThis is a friendly reminder that reviews are due soon for {paper_word} {', '.join(papers)}. (Maybe you have other reviews to complete as well, but these are the ones I'm assigned as vice chair for.)\n\nPlease complete your reviews by this Friday AoE so things can stay on track.\n\nBest,\nMike (ASPLOS vice chair)"
+            subject = f"Reminder: {'Review' if len(papers) == 1 else 'Reviews'} for ASPLOS {paper_word} {', '.join(papers)} due soon"
+            papers_str = ', '.join(papers)
+            message = f"Hi {first_name},\n\nThis is a friendly reminder that your " + (f'review for paper {papers_str} is' if len(papers) == 1 else f'reviews for papers {papers_str} are') + f" due soon. (Maybe you have other reviews to complete as well, but these are the ones I'm assigned as vice chair for.)\n\nPlease complete your reviews by this Friday AoE so things can stay on track.\n\nBest,\nMike (ASPLOS vice chair)"
             email_messages.append((f"{reviewer} <{email}>", subject, message))
     
     return email_messages

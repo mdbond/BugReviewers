@@ -10,11 +10,11 @@ Generates e-mails to delinquent HotCRP reviewers.
 
 The script assumes that `submissions.html` and `pc.html` exist in current directory:
 
-* `submissions.html` is a saved copy of a HotCRP paper search result such as [https://asplos25summer.hotcrp.com/search?q=%23vc.mike+%23r2+&t=s](this). **You need to select "Reviewers" under "View Options" so that reviewer names are in the generated HTML**.
+* `submissions.html` is a saved copy of a HotCRP paper search result such as [https://asplos25summer.hotcrp.com/search?q=%23vc.mike+%23r2+&t=s](this).
 
 * `pc.html` is a saved copy of a PC page with e-mails such as [https://asplos25summer.hotcrp.com/users/pc](this).
 
-Important: You'll need to edit `gen.py` to match your use case (at a minimum, least change the signature and "From" e-mail).
+Important: You'll need to edit `gen.py` to match your use case. At a minimum, change the signature (unless your name is also Mike) and the "From" e-mail.
 
 ### Running the script
 
