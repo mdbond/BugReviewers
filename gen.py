@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import re
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import sys
 
 def extract_delinquent_reviewers(submissions_html, pc_html):
     # Parse the submissions HTML to find delinquent reviewers
@@ -28,8 +29,8 @@ def extract_delinquent_reviewers(submissions_html, pc_html):
                         if reviewer_name not in delinquent_reviewers:
                             delinquent_reviewers[reviewer_name] = []
                         delinquent_reviewers[reviewer_name].append(paper_id)
-    
-    
+
+
     # Parse the PC HTML to get reviewer emails
     with open(pc_html, 'r') as file:
         pc_soup = BeautifulSoup(file, 'html.parser')
@@ -54,20 +55,33 @@ def generate_emails(delinquent_reviewers, reviewer_emails):
     for reviewer, papers in delinquent_reviewers.items():
         email = reviewer_emails.get(reviewer)
         if email:
+            # TODO: add more nicknames
             first_name = reviewer.split()[0]
+            if reviewer == "Antony Hosking":
+                first_name = "Tony"
+            elif reviewer == "Samuel Guyer":
+                first_name = "Sam"
             paper_word = 'paper' if len(papers) == 1 else 'papers'
-            subject = f"Reminder: {'Review' if len(papers) == 1 else 'Reviews'} for ASPLOS {paper_word} {', '.join(papers)} due soon"
-            papers_str = ', '.join(papers)
-            message = f"Hi {first_name},\n\nThis is a friendly reminder that your " + (f'review for paper {papers_str} is' if len(papers) == 1 else f'reviews for papers {papers_str} are') + f" due soon. (Maybe you have other reviews to complete as well, but these are the ones I'm assigned as vice chair for.)\n\nPlease complete your reviews by this Friday AoE so things can stay on track.\n\nBest,\nMike (ASPLOS vice chair)"
-            email_messages.append((f"{reviewer} <{email}>", subject, message))
-    
+            subject = f"{'Review' if len(papers) == 1 else 'Reviews'} for ASPLOS {paper_word} {', '.join(papers)}"
+            if len(papers) == 1:
+                papers_str = papers[0]
+            elif len(papers) == 2:
+                papers_str = ' and '.join(papers)
+            else:
+                papers_str = ', '.join(papers[:-1]) + ', and ' + papers[-1]
+            message = f"Hi {first_name},\n\nCould you please complete your " + (f'review for paper' if len(papers) == 1 else f'reviews for papers') + f" {papers_str} soon -- definitely no later than this Friday (December 6), or the R2 assignments will be impacted.\n\nBest,\nMike (ASPLOS vice chair)"
+            email_messages.append((f"\"{reviewer}\" <{email}>", subject, message))
+        else:
+            print(f"Could not find email for {reviewer}")
+            sys.exit(1)
+
     return email_messages
 
 def generate_eml_files(emails):
     for i, (email, subject, message) in enumerate(emails):
         # Create an email message
         msg = MIMEMultipart()
-        msg['From'] = 'Michael Bond <mikebond@cse.ohio-state.edu>' # Replace with your email
+        msg['From'] = 'Michael Bond <mikebond@cse.ohio-state.edu>' # Replace with your info
         msg['To'] = email
         msg['Cc'] = 'asplos2025pcchairs@gmail.com' # Remove if not for ASPLOS 2025
         msg['Subject'] = subject
@@ -83,7 +97,7 @@ def main(submissions_html, pc_html):
     delinquent_reviewers, reviewer_emails = extract_delinquent_reviewers(submissions_html, pc_html)
     emails = generate_emails(delinquent_reviewers, reviewer_emails)
     generate_eml_files(emails)
-    
+
     for email, subject, message in emails:
         print(f"To: {email}")
         print(f"Cc: asplos2025pcchairs@gmail.com") # Remove if not for ASPLOS 2025
